@@ -5,43 +5,44 @@ class Soldier {
     this.strength = strength;
   }
   attack() {
-    return this.strength
+    return this.strength;
   }
   
   receiveDamage(damage) {
-    this.health = this.health - damage
+    this.health -= damage;
   }
 }
 
 // Viking
 class Viking extends Soldier {
   constructor(name, health, strength) {
-    super (health, strength)
+    super (health, strength);
     this.name = name;
   }
 
   receiveDamage(damage) {
-    this.health = this.health - damage
+    super.receiveDamage(damage);
     if ((this.health) >0) {
-      return `${this.name} has received ${damage} points of damage`
+      return `${this.name} has received ${damage} points of damage`;
     } else {
-      return `${this.name} has died in act of combat`
+      return `${this.name} has died in act of combat`;
     }
   }
+  
 
   battleCry(){
-    return  "Odin Owns You All!"
+    return  "Odin Owns You All!";
   }
 }
 
 // Saxon
 class Saxon extends Soldier {
   receiveDamage(damage) {
-    this.health = this.health - damage
+    super.receiveDamage(damage);
     if ((this.health) >0) {
-      return `A Saxon has received ${damage} points of damage`
+      return `A Saxon has received ${damage} points of damage`;
     } else {
-      return `A Saxon has died in combat`
+      return `A Saxon has died in combat`;
     }
   }
 }
@@ -49,42 +50,49 @@ class Saxon extends Soldier {
 // War
 class War {
   constructor(){
-    this.vikingArmy = []
-    this.saxonArmy = []
+    this.vikingArmy = [];
+    this.saxonArmy = [];
   } 
 
   addViking(viking) {
-    this.vikingArmy.push(viking)
+    this.vikingArmy.push(viking);
   }
 
   addSaxon(saxon) {
-    this.saxonArmy.push(saxon)
+    this.saxonArmy.push(saxon);
   }
 
-  vikingAttack (){
-    let randomViking = this.vikingArmy[Math.floor(Math.random()*this.vikingArmy.length)]
-    let randomSaxon = this.saxonArmy[Math.floor(Math.random()*this.saxonArmy.length)]
-    let result = randomSaxon.receiveDamage(randomViking.strength)
-    if (randomSaxon.health <= 0) {
-      this.saxonArmy.splice(this.saxonArmy.indexOf(randomSaxon),1)
-      return `A Saxon has died in combat`
-    } else {
-      return result
+  cleanArray(array){
+    return array.filter(el => el.health > 0);
   }
-}
 
-  saxonAttack (){
-    let randomViking = this.vikingArmy[Math.floor(Math.random()*this.vikingArmy.length)]
-    let randomSaxon = this.saxonArmy[Math.floor(Math.random()*this.saxonArmy.length)]
-    let result = randomViking.receiveDamage(randomSaxon.strength)
-    if (randomViking.health <= 0) {
-      this.vikingArmy.splice(this.vikingArmy.indexOf(randomViking),1)
-      return `${randomViking.name} has died in act of combat`
+  getRandomElement (arr){
+    let randomElement = arr[Math.floor((Math.random())*(arr.length))];
+    return randomElement;
+  }
+  
+  genericAttackMethod(attackingCharacter){
+    let randomViking = this.getRandomElement(this.vikingArmy);
+    let randomSaxon = this.getRandomElement(this.saxonArmy);
+    if (attackingCharacter ===  "viking") {
+      let result = randomSaxon.receiveDamage(randomViking.strength);      
+      this.saxonArmy = this.cleanArray(this.saxonArmy);
+      return result;      
     } else {
-      return result
+      let result = randomViking.receiveDamage(randomSaxon.strength);
+      this.vikingArmy = this.cleanArray(this.vikingArmy);
+      return result;
     }
   }
 
+  vikingAttack(){
+    return this.genericAttackMethod("viking");
+  }
+  
+  saxonAttack (){
+    return this.genericAttackMethod("saxon");
+  }
+  
   showStatus (){
     if (this.vikingArmy.length === 0) {
       return "Saxons have fought for their lives and survived another day...";
@@ -92,11 +100,8 @@ class War {
       return "Vikings have won the war of the century!";
     } else {
       return "Vikings and Saxons are still in the thick of battle.";
-    }
-    
+    } 
   }
-
-
 }
 
 // The following is required to make unit tests work.
